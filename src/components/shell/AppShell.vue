@@ -16,6 +16,7 @@
           :key="p.id"
           :title="p.id"
           prepend-icon="mdi-file"
+          @click="profileStore.activeId = p.id"
         />
         <v-divider></v-divider>
         <v-list-subheader>Data</v-list-subheader>
@@ -27,6 +28,7 @@
       v-model="rightDrawer"
       location="right"
       temporary
+      width="360"
     >
       <v-toolbar flat>
         <v-toolbar-title>Controls</v-toolbar-title>

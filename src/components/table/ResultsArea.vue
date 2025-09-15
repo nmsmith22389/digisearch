@@ -123,6 +123,13 @@ watch(headers, (hArr) => {
   });
 });
 
+watch(
+  () => profileStore.activeId,
+  () => {
+    visible.value = {};
+  }
+);
+
 const filteredRows = computed(() => {
   if (!ui.quickFilter) return rows.value.filter(Boolean);
   const q = ui.quickFilter.toLowerCase();

@@ -6,7 +6,11 @@ function clamp01(v: number): number {
 
 export function passesHardFilters(row: Canonical, profile: Profile): boolean {
   const hf = (profile.hard_filters ?? {}) as { [k: string]: unknown };
-  if (Array.isArray(hf.lifecycle) && row.lifecycle && !(hf.lifecycle as string[]).includes(row.lifecycle)) return false;
+  if (Array.isArray(hf.lifecycle) && row.lifecycle) {
+    const life = row.lifecycle.toLowerCase();
+    const ok = (hf.lifecycle as string[]).some((l) => life.includes(l.toLowerCase()));
+    if (!ok) return false;
+  }
   if (Array.isArray(hf.package_allow) && row.package) {
     const pkg = row.package.toLowerCase();
     const ok = (hf.package_allow as string[]).some((p) => pkg.includes(p.toLowerCase()));

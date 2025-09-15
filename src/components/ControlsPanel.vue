@@ -40,25 +40,29 @@
               min="0"
               max="3"
               step="0.1"
-              class="flex-grow-1"
+              class="flex-grow-1 mr-2"
               color="primary"
               thumb-label="always"
               show-ticks
               density="compact"
               hide-details
-            >
-              <template #append>
-                <v-text-field v-model.number="weights[c.name]" type="number" style="width:60px" density="compact" hide-details />
-              </template>
-            </v-slider>
+            />
+            <v-number-input
+              v-model.number="weights[c.name]"
+              :min="0"
+              :max="3"
+              :step="0.1"
+              density="compact"
+              hide-details
+              style="width:60px"
+            />
           </div>
           <div v-if="c.params" class="d-flex mt-2">
-            <v-text-field
+            <v-number-input
               v-for="(_, k) in c.params"
               :key="k"
               v-model.number="params[c.name][k]"
               :label="k"
-              type="number"
               density="compact"
               class="mr-2"
               hide-details
