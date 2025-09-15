@@ -85,7 +85,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, type Ref } from 'vue';
+import { ref, computed, watch } from 'vue';
+import { storeToRefs } from 'pinia';
 import Papa from 'papaparse';
 import { useProfileStore } from '../../store/profile';
 import { useUiStore } from '../../store/ui';
@@ -97,6 +98,7 @@ import { calcTableHeight } from '../../lib/util/layout';
 
 const profileStore = useProfileStore();
 const ui = useUiStore();
+const { visibleCols: visible } = storeToRefs(ui);
 defineEmits(['controls']);
 
 const rawRows = ref<Record<string, string>[]>([]);
@@ -111,8 +113,9 @@ const headers = computed(() => {
   return cols.map((c) => ({ key: c === 'why' ? 'why' : c, title: c === 'score' ? 'Score' : c === 'why' ? 'Why?' : c }));
 });
 
-const visible = ui.visibleCols as unknown as Ref<Record<string, boolean>>;
-const visibleHeaders = computed(() => headers.value.filter((h) => visible.value[h.key] !== false));
+const visibleHeaders = computed(() =>
+  headers.value.filter((h) => visible.value[h.key] !== false)
+);
 
 watch(headers, (hArr) => {
   hArr.forEach((h) => {
