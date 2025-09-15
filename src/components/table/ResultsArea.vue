@@ -121,9 +121,9 @@ watch(headers, (hArr) => {
 });
 
 const filteredRows = computed(() => {
-  if (!ui.quickFilter) return rows.value;
+  if (!ui.quickFilter) return rows.value.filter(Boolean);
   const q = ui.quickFilter.toLowerCase();
-  return rows.value.filter((r) => JSON.stringify(r).toLowerCase().includes(q));
+  return rows.value.filter((r) => r && JSON.stringify(r).toLowerCase().includes(q));
 });
 
 const tableHeight = computed(() => calcTableHeight());
@@ -173,7 +173,7 @@ function recompute() {
     })
     .filter((r): r is any => !!r);
   ui.totalRows = rows.value.length;
-  ui.passedRows = rows.value.filter((r) => (r.score ?? 0) > 0).length;
+  ui.passedRows = rows.value.filter((r) => r && (r.score ?? 0) > 0).length;
   ui.droppedRows = ui.totalRows - ui.passedRows;
 }
 
