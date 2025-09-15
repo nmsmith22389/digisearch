@@ -5,6 +5,7 @@
       accept=".csv"
       @change="onFile"
       color="primary"
+      prepend-icon="mdi-file-upload"
       hint="Download a Digi-Key CSV and drop it here"
       persistent-hint
       hide-details
@@ -42,7 +43,20 @@
         </v-menu>
       </template>
     </v-data-table>
-    <v-btn v-if="rows.length" class="mt-2" color="primary" @click="exportCsv">Export</v-btn>
+    <v-tooltip v-if="rows.length" location="top">
+      <template #activator="{ props }">
+        <v-btn
+          class="mt-2"
+          color="primary"
+          prepend-icon="mdi-download"
+          @click="exportCsv"
+          v-bind="props"
+        >
+          Export
+        </v-btn>
+      </template>
+      <span>Download ranked CSV</span>
+    </v-tooltip>
   </div>
 </template>
 

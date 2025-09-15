@@ -3,15 +3,17 @@
     <p class="text-body-2 mb-4">
       Adjust scoring weights and parameters. Hover labels for help.
     </p>
-    <v-text-field
+    <v-number-input
       v-model.number="priceQty"
       label="Price Qty"
-      type="number"
       class="mb-4"
+      :min="1"
+      :step="1"
+      color="primary"
       hint="Select quantity to choose price column"
       persistent-hint
       hide-details
-    ></v-text-field>
+    ></v-number-input>
     <div v-for="c in profile.criteria" :key="c.name" class="mb-4">
       <div class="d-flex align-center">
         <v-tooltip location="top">
@@ -28,21 +30,35 @@
           class="flex-grow-1"
           color="primary"
           thumb-label="always"
+          show-ticks
           hide-details
-        ></v-slider>
+        >
+          <template #append>
+            <v-number-input
+              v-model.number="weights[c.name]"
+              :min="0"
+              :max="3"
+              :step="0.1"
+              density="compact"
+              hide-details
+              style="width:72px"
+            ></v-number-input>
+          </template>
+        </v-slider>
       </div>
       <div v-if="c.params" class="d-flex mt-2">
-        <v-text-field
+        <v-number-input
           v-for="(_, k) in c.params"
           :key="k"
           v-model.number="params[c.name][k]"
           :label="k"
-          type="number"
           class="mr-2"
+          density="compact"
+          color="primary"
           hint="Parameter {{ k }} for {{ c.name }}"
           persistent-hint
           hide-details
-        ></v-text-field>
+        ></v-number-input>
       </div>
     </div>
   </v-card>
