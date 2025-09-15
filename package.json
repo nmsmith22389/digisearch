@@ -16,7 +16,8 @@
     "papaparse": "^5.5.3",
     "pinia": "^3.0.3",
     "vue": "^3.5.18",
-    "vuetify": "^3.5.0"
+    "vuetify": "^3.5.0",
+    "vue-tsc": "^3.0.7"
   },
   "devDependencies": {
     "@eslint/js": "^9.35.0",
@@ -35,7 +36,6 @@
     "vite": "^7.1.2",
     "vite-plugin-vuetify": "^2.1.2",
     "vitest": "^3.2.4",
-    "vue-tsc": "^3.0.5",
     "@types/papaparse": "^5.3.9",
     "@types/js-yaml": "^4.0.9"
   }
