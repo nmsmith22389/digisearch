@@ -8,6 +8,12 @@ pnpm install
 pnpm dev
 ```
 
+To produce a production bundle run:
+
+```bash
+pnpm build
+```
+
 ## Usage
 1. Export a CSV from Digi-Key's website.
 2. Drag the CSV into the app or use the file picker.
