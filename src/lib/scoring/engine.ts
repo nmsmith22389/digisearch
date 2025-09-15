@@ -5,17 +5,25 @@ function clamp01(v: number): number {
 }
 
 export function passesHardFilters(row: Canonical, profile: Profile): boolean {
-  const hf = profile.hard_filters || {};
-  if (hf.lifecycle && row.lifecycle && !hf.lifecycle.includes(row.lifecycle)) return false;
-  if (hf.package_allow && row.package && !hf.package_allow.includes(row.package)) return false;
-  if (hf.dielectric_allow && typeof row.attrs.dielectric === 'string' && !hf.dielectric_allow.includes(String(row.attrs.dielectric))) return false;
-  if (hf.min_voltage_V !== undefined) {
-    const v = (row.attrs.voltage_V as number) ?? (row.attrs.max_work_V as number);
-    if (typeof v === 'number' && v < hf.min_voltage_V) return false;
+  const hf = (profile.hard_filters ?? {}) as { [k: string]: unknown };
+  if (Array.isArray(hf.lifecycle) && row.lifecycle && !(hf.lifecycle as string[]).includes(row.lifecycle)) return false;
+  if (Array.isArray(hf.package_allow) && row.package) {
+    const pkg = row.package.toLowerCase();
+    const ok = (hf.package_allow as string[]).some((p) => pkg.includes(p.toLowerCase()));
+    if (!ok) return false;
   }
-  if (hf.max_tolerance_pct !== undefined) {
+  if (Array.isArray(hf.dielectric_allow) && typeof row.attrs.dielectric === 'string') {
+    const diel = String(row.attrs.dielectric).toLowerCase();
+    const ok = (hf.dielectric_allow as string[]).some((d) => diel.includes(d.toLowerCase()));
+    if (!ok) return false;
+  }
+  if (typeof hf.min_voltage_V === 'number') {
+    const v = (row.attrs.voltage_V as number) ?? (row.attrs.max_work_V as number);
+    if (typeof v === 'number' && v < (hf.min_voltage_V as number)) return false;
+  }
+  if (typeof hf.max_tolerance_pct === 'number') {
     const v = row.attrs.tol_pct as number;
-    if (typeof v === 'number' && v > hf.max_tolerance_pct) return false;
+    if (typeof v === 'number' && v > (hf.max_tolerance_pct as number)) return false;
   }
   return true;
 }

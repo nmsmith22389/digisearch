@@ -38,6 +38,7 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
 import Papa from 'papaparse';
+import type { ParseResult } from 'papaparse';
 import { useProfileStore } from '../store/profile';
 import { normalizeRow } from '../lib/csv/normalize';
 import { scoreRow } from '../lib/scoring/engine';
@@ -66,7 +67,7 @@ function onFile(e: Event) {
   Papa.parse(file, {
     header: true,
     skipEmptyLines: true,
-    complete(res) {
+    complete(res: ParseResult<Record<string, string>>) {
       rawRows.value = res.data as any[];
       const fields = res.meta.fields || [];
       const cats = rawRows.value.map((r) => (r.Category || r.category || '') as string);
@@ -84,16 +85,20 @@ function recompute() {
   prof.criteria = prof.criteria.map((c) => ({
     ...c,
     weight: store.weights[c.name] ?? c.weight,
-    params: { ...c.params, ...(store.params[c.name] || {}) },
-  }));
+    params: { ...(c.params || {}), ...(store.params[c.name] || {}) },
+  })) as Profile['criteria'];
   rows.value = rawRows.value.map((r) => {
     const norm = normalizeRow(r, prof, store.priceQty);
-    return scoreRow(norm, prof);
+    const scored = scoreRow(norm, prof);
+    return { ...scored, ...(scored.attrs as Record<string, unknown>) };
   });
 }
 
 function exportCsv() {
-  const data = rows.value.map((r) => ({ ...r, ...r.explain }));
+  const data = rows.value.map((r) => {
+    const { attrs, explain, ...rest } = r;
+    return { ...rest, ...explain };
+  });
   const csv = Papa.unparse(data);
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
   const a = document.createElement('a');

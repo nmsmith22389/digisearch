@@ -13,7 +13,7 @@
       ></v-slider>
       <div v-if="c.params" class="d-flex">
         <v-text-field
-          v-for="(v, k) in c.params"
+          v-for="(_, k) in c.params"
           :key="k"
           v-model.number="params[c.name][k]"
           :label="k"
@@ -44,7 +44,7 @@ watch(profile, (p) => {
   if (!p) return;
   p.criteria.forEach((c) => {
     if (weights[c.name] === undefined) weights[c.name] = c.weight;
-    if (!params[c.name]) params[c.name] = { ...c.params };
+    if (!params[c.name]) params[c.name] = { ...(c.params || {}) };
   });
 }, { immediate: true });
 </script>
