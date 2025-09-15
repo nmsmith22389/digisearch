@@ -1,0 +1,28 @@
+id: resistor
+detect:
+  anyColumn: ["Resistance"]
+aliases:
+  mpn: ["Manufacturer Part Number", "MPN"]
+  dkpn: ["Digi-Key Part Number", "DK Part Number"]
+  lifecycle: ["Part Status", "Lifecycle Status"]
+  packaging: ["Packaging"]
+  package: ["Package / Case", "Supplier Device Package", "Case"]
+  stock: ["Quantity Available", "Stock"]
+  price: ["Unit Price", "Price 1", "Price 10", "Price 100"]
+  resistance_Ohm: ["Resistance", "Resistance (Ohms)", "Value"]
+  power_W: ["Power (Watts)", "Power Rating"]
+  tol_pct: ["Tolerance", "Tolerance %"]
+  tcr_ppm: ["Temperature Coefficient", "TCR (ppm/°C)"]
+  max_work_V: ["Max Working Voltage", "Operating Voltage", "Voltage - Max"]
+hard_filters:
+  lifecycle: ["Active"]
+  package_allow: ["0603", "1608 (Metric)"]
+criteria:
+  - { name: price, type: lower_better_vs_target, field: price, weight: 2.0, params: { target: 0.05 } }
+  - { name: stock, type: stock_saturating, field: stock, weight: 1.0 }
+  - { name: tcr, type: lower_better, field: tcr_ppm, weight: 1.0, params: { ref: 100 } }
+  - { name: tol, type: lower_better, field: tol_pct, weight: 0.6, params: { ref: 1.0 } }
+  - { name: power_headroom, type: headroom, field: power_W, weight: 1.0, params: { min: 0.1, prefer: 0.25 } }
+  - { name: voltage_headroom, type: headroom, field: max_work_V, weight: 0.8, params: { min: 50, prefer: 75 } }
+  - { name: lifecycle, type: bool_bonus, field: lifecycle_active, weight: 0.5 }
+columns: ["mpn", "dkpn", "package", "stock", "price", "resistance_Ohm", "power_W", "tol_pct", "tcr_ppm", "max_work_V"]

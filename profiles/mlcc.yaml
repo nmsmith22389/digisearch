@@ -1,0 +1,27 @@
+id: mlcc
+detect:
+  anyColumn: ["Capacitance"]
+aliases:
+  mpn: ["Manufacturer Part Number", "MPN"]
+  dkpn: ["Digi-Key Part Number", "DK Part Number"]
+  lifecycle: ["Part Status", "Lifecycle Status"]
+  packaging: ["Packaging"]
+  package: ["Package / Case", "Supplier Device Package", "Case"]
+  stock: ["Quantity Available", "Stock"]
+  price: ["Unit Price", "Price 1", "Price 10", "Price 100"]
+  capacitance_F: ["Capacitance"]
+  voltage_V: ["Voltage - Rated"]
+  dielectric: ["Dielectric"]
+  temp_C: ["Operating Temperature", "Operating Temperature - Top"]
+hard_filters:
+  lifecycle: ["Active"]
+  dielectric_allow: ["X5R", "X7R", "C0G/NP0"]
+  min_voltage_V: 6.3
+  max_tolerance_pct: 1.0
+criteria:
+  - { name: price, type: lower_better_vs_target, field: price, weight: 2.0, params: { target: 0.1 } }
+  - { name: stock, type: stock_saturating, field: stock, weight: 1.0 }
+  - { name: capacitance_target, type: nearer_is_better, field: capacitance_F, weight: 1.0, params: { target: 1e-05, tol: 5e-06 } }
+  - { name: temp_rating, type: higher_better, field: temp_C, weight: 0.5, params: { ref: 85, max: 125 } }
+  - { name: lifecycle, type: bool_bonus, field: lifecycle_active, weight: 0.5 }
+columns: ["mpn", "dkpn", "package", "stock", "price", "capacitance_F", "voltage_V", "dielectric", "temp_C"]

@@ -1,0 +1,23 @@
+id: diode_schottky
+detect:
+  anyColumn: ["Voltage - Forward (Vf) (Max) @ If"]
+aliases:
+  mpn: ["Manufacturer Part Number", "MPN"]
+  dkpn: ["Digi-Key Part Number", "DK Part Number"]
+  lifecycle: ["Part Status", "Lifecycle Status"]
+  packaging: ["Packaging"]
+  package: ["Package / Case", "Supplier Device Package", "Case"]
+  stock: ["Quantity Available", "Stock"]
+  price: ["Unit Price", "Price 1", "Price 10", "Price 100"]
+  vr_V: ["Voltage - DC Reverse (Vr) (Max)", "Reverse Voltage (Vr)"]
+  if_A: ["Current - Average Rectified (Io)", "Average Forward Current (Io)"]
+  vf_V: ["Voltage - Forward (Vf) (Max) @ If", "Forward Voltage (Vf)"]
+hard_filters:
+  lifecycle: ["Active"]
+criteria:
+  - { name: price, type: lower_better_vs_target, field: price, weight: 2.0, params: { target: 0.2 } }
+  - { name: stock, type: stock_saturating, field: stock, weight: 1.0 }
+  - { name: forward_drop, type: lower_better, field: vf_V, weight: 1.0, params: { ref: 0.45 } }
+  - { name: current_margin, type: headroom, field: if_A, weight: 1.0, params: { min: 1.0, prefer: 2.0 } }
+  - { name: lifecycle, type: bool_bonus, field: lifecycle_active, weight: 0.5 }
+columns: ["mpn", "dkpn", "package", "stock", "price", "vr_V", "if_A", "vf_V"]
