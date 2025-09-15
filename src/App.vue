@@ -1,9 +1,14 @@
 <template>
   <v-app>
+    <v-navigation-drawer app permanent width="300">
+      <ControlsPanel />
+    </v-navigation-drawer>
+    <v-app-bar app color="primary" dark>
+      <v-toolbar-title>DigiSearch</v-toolbar-title>
+    </v-app-bar>
     <v-main>
-      <v-container fluid class="d-flex flex-column" style="height:100vh;">
-        <ControlsPanel class="mb-4" />
-        <DkScoredTable class="flex-grow-1" />
+      <v-container fluid class="pa-4">
+        <DkScoredTable />
       </v-container>
     </v-main>
   </v-app>

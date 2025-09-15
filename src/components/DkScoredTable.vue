@@ -1,6 +1,14 @@
 <template>
   <div>
-    <v-file-input label="CSV" accept=".csv" @change="onFile" hide-details></v-file-input>
+    <v-file-input
+      label="CSV"
+      accept=".csv"
+      @change="onFile"
+      color="primary"
+      hint="Download a Digi-Key CSV and drop it here"
+      persistent-hint
+      hide-details
+    ></v-file-input>
     <v-select
       v-if="profiles.length"
       :items="profiles"
@@ -8,6 +16,9 @@
       item-value="id"
       v-model="profileId"
       label="Profile"
+      color="primary"
+      hint="Auto-detected profile; override if needed"
+      persistent-hint
       hide-details
     ></v-select>
     <v-data-table
@@ -21,7 +32,7 @@
       <template #item.why="{ item }">
         <v-menu>
           <template #activator="{ props }">
-            <v-btn v-bind="props" icon="mdi-help-circle"></v-btn>
+            <v-btn v-bind="props" icon="mdi-help-circle" color="primary" variant="text"></v-btn>
           </template>
           <v-list>
             <v-list-item v-for="(v, k) in item.explain" :key="k">
@@ -31,7 +42,7 @@
         </v-menu>
       </template>
     </v-data-table>
-    <v-btn v-if="rows.length" class="mt-2" @click="exportCsv">Export</v-btn>
+    <v-btn v-if="rows.length" class="mt-2" color="primary" @click="exportCsv">Export</v-btn>
   </div>
 </template>
 
