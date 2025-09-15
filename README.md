@@ -1,6 +1,6 @@
 # DigiSearch
 
-Local CSV scoring tool for Digi-Key parts.
+Local CSV scoring tool for Digi-Key parts, featuring a Vuetify app shell with navigation and control drawers.
 
 ## Quickstart
 ```bash

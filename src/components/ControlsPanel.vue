@@ -1,88 +1,119 @@
 <template>
-  <v-card v-if="profile" flat class="pa-4">
-    <p class="text-body-2 mb-4">
-      Adjust scoring weights and parameters. Hover labels for help.
-    </p>
-    <v-number-input
-      v-model.number="priceQty"
-      label="Price Qty"
-      class="mb-4"
-      :min="1"
-      :step="1"
-      color="primary"
-      hint="Select quantity to choose price column"
-      persistent-hint
-      hide-details
-    ></v-number-input>
-    <div v-for="c in profile.criteria" :key="c.name" class="mb-4">
-      <div class="d-flex align-center">
-        <v-tooltip location="top">
-          <template #activator="{ props }">
-            <span v-bind="props" class="mr-2" style="width:120px">{{ c.name }}</span>
-          </template>
-          <span>Weight for {{ c.name }}</span>
-        </v-tooltip>
-        <v-slider
-          v-model.number="weights[c.name]"
-          min="0"
-          max="3"
-          step="0.1"
-          class="flex-grow-1"
-          color="primary"
-          thumb-label="always"
-          show-ticks
+  <v-card flat class="pa-2" v-if="profile">
+    <v-card class="mb-4" elevation="2" rounded="xl">
+      <v-card-title>Import</v-card-title>
+      <v-card-text>
+        <file-drop-zone @file="onFile" :rows="rowsCount" class="mb-2" />
+        <v-file-input accept=".csv" density="compact" hide-details @change="onInput" />
+      </v-card-text>
+    </v-card>
+
+    <v-card class="mb-4" elevation="2" rounded="xl">
+      <v-card-title>Profile</v-card-title>
+      <v-card-text>
+        <v-select
+          :items="profiles"
+          item-title="id"
+          item-value="id"
+          v-model="profileId"
+          density="compact"
           hide-details
-        >
-          <template #append>
-            <v-number-input
+        />
+      </v-card-text>
+    </v-card>
+
+    <v-card class="mb-4" elevation="2" rounded="xl">
+      <v-card-title>Pricing quantity</v-card-title>
+      <v-card-text>
+        <v-select :items="[1,10,100,1000]" v-model="priceQty" density="compact" hide-details />
+      </v-card-text>
+    </v-card>
+
+    <v-card elevation="2" rounded="xl">
+      <v-card-title>Weights &amp; params</v-card-title>
+      <v-card-text>
+        <div v-for="c in profile.criteria" :key="c.name" class="mb-4">
+          <div class="d-flex align-center">
+            <span class="mr-2" style="width:120px">{{ c.name }}</span>
+            <v-slider
               v-model.number="weights[c.name]"
-              :min="0"
-              :max="3"
-              :step="0.1"
+              min="0"
+              max="3"
+              step="0.1"
+              class="flex-grow-1"
+              color="primary"
+              thumb-label="always"
+              show-ticks
               density="compact"
               hide-details
-              style="width:72px"
-            ></v-number-input>
-          </template>
-        </v-slider>
-      </div>
-      <div v-if="c.params" class="d-flex mt-2">
-        <v-number-input
-          v-for="(_, k) in c.params"
-          :key="k"
-          v-model.number="params[c.name][k]"
-          :label="k"
-          class="mr-2"
-          density="compact"
-          color="primary"
-          hint="Parameter {{ k }} for {{ c.name }}"
-          persistent-hint
-          hide-details
-        ></v-number-input>
-      </div>
-    </div>
+            >
+              <template #append>
+                <v-text-field v-model.number="weights[c.name]" type="number" style="width:60px" density="compact" hide-details />
+              </template>
+            </v-slider>
+          </div>
+          <div v-if="c.params" class="d-flex mt-2">
+            <v-text-field
+              v-for="(_, k) in c.params"
+              :key="k"
+              v-model.number="params[c.name][k]"
+              :label="k"
+              type="number"
+              density="compact"
+              class="mr-2"
+              hide-details
+            />
+          </div>
+        </div>
+      </v-card-text>
+    </v-card>
   </v-card>
 </template>
 
 <script setup lang="ts">
 import { computed, watch } from 'vue';
 import { useProfileStore } from '../store/profile';
+import { useUiStore } from '../store/ui';
+import FileDropZone from './common/FileDropZone.vue';
 
-const store = useProfileStore();
-const profile = computed(() => store.active);
+const emit = defineEmits<{ (e: 'file', file: File): void }>();
 
-const weights = store.weights;
-const params = store.params as any;
+const profileStore = useProfileStore();
+const ui = useUiStore();
+
+const profile = computed(() => profileStore.active);
+const profiles = computed(() => profileStore.allProfiles);
+
+const weights = profileStore.weights;
+const params = profileStore.params as any;
 const priceQty = computed({
-  get: () => store.priceQty,
-  set: (v) => (store.priceQty = v),
+  get: () => profileStore.priceQty,
+  set: (v) => (profileStore.priceQty = v),
+});
+const profileId = computed({
+  get: () => profileStore.activeId,
+  set: (v) => (profileStore.activeId = v),
 });
 
-watch(profile, (p) => {
-  if (!p) return;
-  p.criteria.forEach((c) => {
-    if (weights[c.name] === undefined) weights[c.name] = c.weight;
-    if (!params[c.name]) params[c.name] = { ...(c.params || {}) };
-  });
-}, { immediate: true });
+const rowsCount = computed(() => ui.totalRows);
+
+function onFile(file: File) {
+  emit('file', file);
+}
+function onInput(e: Event) {
+  const file = (e.target as HTMLInputElement).files?.[0];
+  if (file) emit('file', file);
+}
+
+watch(
+  profile,
+  (p) => {
+    if (!p) return;
+    p.criteria.forEach((c) => {
+      if (weights[c.name] === undefined) weights[c.name] = c.weight;
+      if (!params[c.name]) params[c.name] = { ...(c.params || {}) };
+    });
+  },
+  { immediate: true }
+);
 </script>
