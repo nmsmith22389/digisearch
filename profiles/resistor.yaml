@@ -25,4 +25,4 @@ criteria:
   - { name: power_headroom, type: headroom, field: power_W, weight: 1.0, params: { min: 0.1, prefer: 0.25 } }
   - { name: voltage_headroom, type: headroom, field: max_work_V, weight: 0.8, params: { min: 50, prefer: 75 } }
   - { name: lifecycle, type: bool_bonus, field: lifecycle_active, weight: 0.5 }
-columns: ["mpn", "dkpn", "package", "stock", "price", "resistance_Ohm", "power_W", "tol_pct"]
+columns: ["mpn", "dkpn", "package", "stock", "price", "resistance_Ohm", "power_W", "tol_pct", "tcr_ppm", "max_work_V"]

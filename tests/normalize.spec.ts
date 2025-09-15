@@ -14,7 +14,7 @@ describe('normalize', () => {
       Packaging: 'Cut Tape',
       'Package / Case': '0603',
       'Quantity Available': '1,000',
-      'Unit Price': '0.02',
+      'Unit Price (USD)': '0.02',
       Resistance: '4.7kΩ',
       'Power (Watts)': '0.25W',
       Tolerance: '1%',

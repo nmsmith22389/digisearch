@@ -1,11 +1,15 @@
 import { parseQty } from '../units/parseQty';
 import type { Canonical, Profile } from '../scoring/types';
 
+function normKey(s: string): string {
+  return s.toLowerCase().replace(/[^a-z0-9]/g, '');
+}
+
 export function buildAliasMap(profile: Profile): Record<string, string> {
   const map: Record<string, string> = {};
   for (const [key, aliases] of Object.entries(profile.aliases)) {
     for (const a of aliases) {
-      map[a.toLowerCase()] = key;
+      map[normKey(a)] = key;
     }
   }
   return map;
@@ -18,28 +22,28 @@ export function normalizeRow(
 ): Canonical {
   const lowerRow: Record<string, string> = {};
   for (const [k, v] of Object.entries(row)) {
-    lowerRow[k.toLowerCase()] = v;
+    lowerRow[normKey(k)] = v;
   }
+  const entries = Object.entries(lowerRow);
   const get = (canon: string): string | undefined => {
     const aliases = profile.aliases[canon];
     if (!aliases) return undefined;
+    const keys = aliases.map((a) => normKey(a));
+    const findByKey = (target: string): string | undefined => {
+      const exact = lowerRow[target];
+      if (exact !== undefined) return exact;
+      const found = entries.find(([k]) => k.startsWith(target));
+      return found ? found[1] : undefined;
+    };
     if (canon === 'price') {
-      let target = aliases.find(
-        (a) => a.toLowerCase() === `price ${priceQty}`.toLowerCase()
-      );
-      if (target && lowerRow[target.toLowerCase()] !== undefined)
-        return lowerRow[target.toLowerCase()];
-      target = aliases.find((a) => a.toLowerCase() === 'unit price');
-      if (target && lowerRow[target.toLowerCase()] !== undefined)
-        return lowerRow[target.toLowerCase()];
-      for (const a of aliases) {
-        const v = lowerRow[a.toLowerCase()];
-        if (v !== undefined) return v;
-      }
-      return undefined;
+      const qtyKey = normKey(`price ${priceQty}`);
+      const qtyVal = findByKey(qtyKey);
+      if (qtyVal !== undefined) return qtyVal;
+      const unitVal = findByKey(normKey('unit price'));
+      if (unitVal !== undefined) return unitVal;
     }
-    for (const a of aliases) {
-      const v = lowerRow[a.toLowerCase()];
+    for (const key of keys) {
+      const v = findByKey(key);
       if (v !== undefined) return v;
     }
     return undefined;

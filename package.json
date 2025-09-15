@@ -17,7 +17,8 @@
     "pinia": "^3.0.3",
     "vue": "^3.5.18",
     "vuetify": "^3.5.0",
-    "vue-tsc": "^3.0.7"
+    "vue-tsc": "^3.0.7",
+    "@mdi/font": "^7.4.47"
   },
   "devDependencies": {
     "@eslint/js": "^9.35.0",

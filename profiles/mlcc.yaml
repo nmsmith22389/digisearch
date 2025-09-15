@@ -24,4 +24,4 @@ criteria:
   - { name: capacitance_target, type: nearer_is_better, field: capacitance_F, weight: 1.0, params: { target: 1e-05, tol: 5e-06 } }
   - { name: temp_rating, type: higher_better, field: temp_C, weight: 0.5, params: { ref: 85, max: 125 } }
   - { name: lifecycle, type: bool_bonus, field: lifecycle_active, weight: 0.5 }
-columns: ["mpn", "dkpn", "package", "stock", "price", "capacitance_F", "voltage_V", "dielectric"]
+columns: ["mpn", "dkpn", "package", "stock", "price", "capacitance_F", "voltage_V", "dielectric", "temp_C"]

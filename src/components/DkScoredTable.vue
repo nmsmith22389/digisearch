@@ -1,33 +1,37 @@
 <template>
-  <div>
-    <v-file-input
-      label="CSV"
-      accept=".csv"
-      @change="onFile"
-      color="primary"
-      prepend-icon="mdi-file-upload"
-      hint="Download a Digi-Key CSV and drop it here"
-      persistent-hint
-      hide-details
-    ></v-file-input>
-    <v-select
-      v-if="profiles.length"
-      :items="profiles"
-      item-title="id"
-      item-value="id"
-      v-model="profileId"
-      label="Profile"
-      color="primary"
-      hint="Auto-detected profile; override if needed"
-      persistent-hint
-      hide-details
-    ></v-select>
+  <v-container fluid>
+    <v-row class="mb-2" align="center">
+      <v-col cols="12" md="6">
+        <v-file-input
+          label="CSV"
+          accept=".csv"
+          @change="onFile"
+          color="primary"
+          prepend-icon="mdi-file-upload"
+          hint="Download a Digi-Key CSV and drop it here"
+          persistent-hint
+          hide-details
+        ></v-file-input>
+      </v-col>
+      <v-col cols="12" md="6" v-if="profiles.length">
+        <v-select
+          :items="profiles"
+          item-title="id"
+          item-value="id"
+          v-model="profileId"
+          label="Profile"
+          color="primary"
+          hint="Auto-detected profile; override if needed"
+          persistent-hint
+          hide-details
+        ></v-select>
+      </v-col>
+    </v-row>
     <v-data-table
       v-if="rows.length"
       :headers="headers"
       :items="rows"
       :sort-by="[{ key: 'score', order: 'desc' }]"
-      class="mt-4"
     >
       <template #item.score="{ item }">{{ item.score?.toFixed(3) }}</template>
       <template #item.why="{ item }">
@@ -43,21 +47,24 @@
         </v-menu>
       </template>
     </v-data-table>
-    <v-tooltip v-if="rows.length" location="top">
-      <template #activator="{ props }">
-        <v-btn
-          class="mt-2"
-          color="primary"
-          prepend-icon="mdi-download"
-          @click="exportCsv"
-          v-bind="props"
-        >
-          Export
-        </v-btn>
-      </template>
-      <span>Download ranked CSV</span>
-    </v-tooltip>
-  </div>
+    <v-row v-if="rows.length" class="mt-2">
+      <v-col class="text-right">
+        <v-tooltip location="top">
+          <template #activator="{ props }">
+            <v-btn
+              color="primary"
+              prepend-icon="mdi-download"
+              @click="exportCsv"
+              v-bind="props"
+            >
+              Export
+            </v-btn>
+          </template>
+          <span>Download ranked CSV</span>
+        </v-tooltip>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 
 <script setup lang="ts">
@@ -81,7 +88,7 @@ const profileId = computed({
 const headers = computed(() => {
   const p = store.active;
   if (!p) return [];
-  const cols = ['score', ...p.columns, 'why'];
+  const cols = Array.from(new Set(['score', ...p.columns, ...p.criteria.map((c) => c.field), 'why']));
   return cols.map((c) => ({ key: c === 'why' ? 'why' : c, title: c === 'score' ? 'Score' : c === 'why' ? 'Why?' : c }));
 });
 
