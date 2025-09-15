@@ -95,11 +95,12 @@
 
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue';
-import { useDisplay, useTheme, useDefaults } from 'vuetify';
+import { useDisplay, useTheme } from 'vuetify';
 import ControlsPanel from '../ControlsPanel.vue';
 import ResultsArea from '../table/ResultsArea.vue';
 import { useProfileStore } from '../../store/profile';
 import { useUiStore } from '../../store/ui';
+import vuetify from '../../plugins/vuetify';
 
 const leftDrawer = ref(false);
 const rightDrawer = ref(false);
@@ -111,12 +112,11 @@ const breadcrumbs = computed(() => [{ title: 'Home' }, { title: 'CSV' }]);
 
 const { mdAndUp } = useDisplay();
 const theme = useTheme();
-const defaults = useDefaults();
 
 watch(
   () => ui.theme,
   (t) => {
-    theme.global.name.value = t;
+    theme.change(t);
   },
   { immediate: true }
 );
@@ -124,7 +124,8 @@ watch(
 watch(
   () => ui.density,
   (d) => {
-    defaults.global!.density = d as any;
+    const globals = (vuetify.defaults.value!.global ||= {} as any);
+    globals.density = d as any;
   },
   { immediate: true }
 );
