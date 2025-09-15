@@ -3,7 +3,11 @@ import { ref, computed, watch } from 'vue';
 import yaml from 'js-yaml';
 import type { Profile } from '../lib/scoring/types';
 
-const modules = import.meta.glob<string>('../../profiles/*.yaml', { as: 'raw', eager: true });
+const modules = import.meta.glob<string>('../../profiles/*.yaml', {
+  query: '?raw',
+  import: 'default',
+  eager: true,
+});
 const loaded: Profile[] = Object.values(modules).map((raw) => yaml.load(raw) as Profile);
 
 export const useProfileStore = defineStore('profile', () => {

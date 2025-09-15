@@ -97,6 +97,7 @@ import { calcTableHeight } from '../../lib/util/layout';
 
 const profileStore = useProfileStore();
 const ui = useUiStore();
+defineEmits(['controls']);
 
 const rawRows = ref<Record<string, string>[]>([]);
 const rows = ref<any[]>([]);
@@ -163,13 +164,16 @@ function recompute() {
     weight: profileStore.weights[c.name] ?? c.weight,
     params: { ...(c.params || {}), ...(profileStore.params[c.name] || {}) },
   })) as Profile['criteria'];
-  rows.value = rawRows.value.map((r) => {
-    const norm = normalizeRow(r, prof, profileStore.priceQty);
-    const scored = scoreRow(norm, prof);
-    return { ...scored, ...(scored.attrs as Record<string, unknown>) };
-  });
+  rows.value = rawRows.value
+    .map((r) => {
+      const norm = normalizeRow(r, prof, profileStore.priceQty);
+      if (!norm) return undefined;
+      const scored = scoreRow(norm, prof);
+      return { ...scored, ...(scored.attrs as Record<string, unknown>) };
+    })
+    .filter((r): r is any => !!r);
   ui.totalRows = rows.value.length;
-  ui.passedRows = rows.value.filter((r) => r.score && r.score > 0).length;
+  ui.passedRows = rows.value.filter((r) => (r.score ?? 0) > 0).length;
   ui.droppedRows = ui.totalRows - ui.passedRows;
 }
 
